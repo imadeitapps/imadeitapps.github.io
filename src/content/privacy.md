@@ -1,13 +1,13 @@
 ---
 title: Privacy Policy
 description: iMadeIt Apps privacy policy — how our apps handle your data and protect your privacy.
-lastUpdated: December 2025
+lastUpdated: June 2026
 contactEmail: imadeitapps@proton.me
 ---
 
 # Privacy Policy
 
-<p class="updated">Last updated: December 2025</p>
+<p class="updated">Last updated: June 2026</p>
 
 Your privacy matters. This policy explains what data the apps made by iMadeIt Apps (operated by Cenk Celik, referred to here as "we", "us", or "our") collect, how that data is used, and your rights regarding it.
 
