@@ -1,0 +1,76 @@
+name: Build & Deploy to GitHub Pages
+
+on:
+  # Auto-deploy when apps.json or source changes on main
+  push:
+    branches: [main]
+    paths:
+      - 'data/apps.json'
+      - 'src/**'
+      - 'public/**'
+      - 'scripts/**'
+      - 'astro.config.mjs'
+      - 'package.json'
+      - '.github/workflows/deploy.yml'
+
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+# Required for GitHub Pages deployment via Actions
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Prevent overlapping deployments
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # ── Job 1: Build ───────────────────────────────────────────────────────────
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch app metadata from iTunes API
+        id: fetch
+        run: node scripts/fetch-apps.js
+        # Continue even if some apps fail; the script exits 1 only when 0 apps succeed.
+
+      - name: Build Astro site
+        run: npm run build:static
+        # build:static skips the fetch step (already done above)
+        env:
+          NODE_ENV: production
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+  # ── Job 2: Deploy ──────────────────────────────────────────────────────────
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

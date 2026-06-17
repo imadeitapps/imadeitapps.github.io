@@ -1,0 +1,74 @@
+---
+import StarRating from './StarRating.astro';
+
+interface AppMeta {
+  id: string;
+  name: string;
+  subtitle: string;
+  shortDescription: string;
+  icon: string;
+  category: string;
+  rating: number | null;
+  ratingCount: number;
+  url: string;
+  price: string;
+}
+
+interface Props {
+  app: AppMeta;
+}
+
+const { app } = Astro.props;
+
+const label = app.subtitle || app.shortDescription || app.name;
+const ariaLabel = `${app.name}${app.subtitle ? ` — ${app.subtitle}` : ''}. View on the App Store.`;
+---
+
+<a
+  href={app.url}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="app-card js-reveal"
+  aria-label={ariaLabel}
+>
+  <!-- Icon -->
+  <div class="app-card__icon">
+    {app.icon ? (
+      <img
+        src={app.icon}
+        alt={`${app.name} app icon`}
+        width="76"
+        height="76"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <!-- Placeholder when icon is not yet loaded -->
+      <svg viewBox="0 0 76 76" xmlns="http://www.w3.org/2000/svg" width="76" height="76">
+        <rect width="76" height="76" fill="var(--c-bg-secondary)" />
+        <text x="38" y="46" text-anchor="middle" font-size="28" fill="var(--c-text-3)" font-family="system-ui">
+          {app.name.charAt(0)}
+        </text>
+      </svg>
+    )}
+  </div>
+
+  <!-- Name -->
+  <p class="app-card__name">{app.name}</p>
+
+  <!-- Subtitle / short description -->
+  {label && <p class="app-card__subtitle">{label}</p>}
+
+  <!-- Footer row: category + rating or price -->
+  <div class="app-card__meta">
+    {app.category && (
+      <span class="app-card__category">{app.category}</span>
+    )}
+
+    {app.rating !== null && app.rating > 0 ? (
+      <StarRating rating={app.rating} count={app.ratingCount} />
+    ) : (
+      <span class="app-card__price">{app.price}</span>
+    )}
+  </div>
+</a>

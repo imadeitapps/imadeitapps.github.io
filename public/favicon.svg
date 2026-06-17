@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Blue rounded square background -->
+  <rect width="32" height="32" rx="7.5" fill="#0071e3"/>
+  <!-- "i" glyph: dot + stem -->
+  <circle cx="16" cy="10" r="2.2" fill="white"/>
+  <rect x="13.6" y="14.2" width="4.8" height="10.2" rx="2.4" fill="white"/>
+</svg>

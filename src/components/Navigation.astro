@@ -1,0 +1,55 @@
+---
+const path = Astro.url.pathname;
+
+const isActive = (href: string): boolean =>
+  href === '/'
+    ? path === '/' || path === ''
+    : path.startsWith(href);
+---
+
+<header class="nav" role="banner">
+  <nav class="nav__inner" aria-label="Main navigation">
+
+    <!-- Brand -->
+    <a href="/" class="nav__brand" aria-label="iMadeIt Apps — home">
+      <!-- Monogram logo: blue rounded square with "i" glyph -->
+      <svg
+        class="nav__logo"
+        viewBox="0 0 28 28"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <rect width="28" height="28" rx="7" fill="var(--c-accent)" />
+        <!-- Dot -->
+        <circle cx="14" cy="9.5" r="2" fill="white" />
+        <!-- Stem -->
+        <rect x="11.5" y="13.5" width="5" height="8" rx="2.5" fill="white" />
+      </svg>
+
+      <span class="nav__name">iMadeIt Apps</span>
+    </a>
+
+    <!-- Links -->
+    <ul class="nav__links" role="list">
+      <li>
+        <a
+          href="/#apps"
+          class={`nav__link${isActive('/') ? ' nav__link--active' : ''}`}
+        >
+          Apps
+        </a>
+      </li>
+      <li>
+        <a
+          href="/privacy/"
+          class={`nav__link${isActive('/privacy') ? ' nav__link--active' : ''}`}
+        >
+          Privacy
+        </a>
+      </li>
+    </ul>
+
+  </nav>
+</header>

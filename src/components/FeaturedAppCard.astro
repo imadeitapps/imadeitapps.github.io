@@ -1,0 +1,85 @@
+---
+import StarRating from './StarRating.astro';
+
+interface AppMeta {
+  id: string;
+  name: string;
+  subtitle: string;
+  shortDescription: string;
+  description: string;
+  icon: string;
+  category: string;
+  rating: number | null;
+  ratingCount: number;
+  url: string;
+  price: string;
+  developer: string;
+}
+
+interface Props {
+  app: AppMeta;
+}
+
+const { app } = Astro.props;
+
+// Prefer subtitle, else first ~120 chars of description
+const tagline = app.subtitle || (app.shortDescription?.slice(0, 120) + (app.shortDescription?.length > 120 ? '…' : '')) || '';
+---
+
+<a
+  href={app.url}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="featured-card js-reveal"
+  aria-label={`${app.name}${tagline ? ` — ${tagline}` : ''}. View on the App Store.`}
+>
+  <!-- Icon -->
+  <div class="featured-card__icon">
+    {app.icon ? (
+      <img
+        src={app.icon}
+        alt={`${app.name} app icon`}
+        width="104"
+        height="104"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <svg viewBox="0 0 104 104" xmlns="http://www.w3.org/2000/svg" width="104" height="104">
+        <rect width="104" height="104" fill="var(--c-bg-secondary)" />
+        <text x="52" y="64" text-anchor="middle" font-size="44" fill="var(--c-text-3)" font-family="system-ui">
+          {app.name.charAt(0)}
+        </text>
+      </svg>
+    )}
+  </div>
+
+  <!-- Content -->
+  <div class="featured-card__body">
+    <span class="badge-featured">Featured</span>
+
+    <h3 class="featured-card__name">{app.name}</h3>
+
+    {tagline && (
+      <p class="featured-card__subtitle">{tagline}</p>
+    )}
+
+    {app.shortDescription && (
+      <p class="featured-card__desc">{app.shortDescription}</p>
+    )}
+
+    <div class="featured-card__footer">
+      {app.rating !== null && app.rating > 0 && (
+        <StarRating rating={app.rating} count={app.ratingCount} />
+      )}
+
+      <span class="featured-card__cta" aria-hidden="true">
+        {app.price && app.price !== 'Free' ? app.price : 'Get App'}
+        <!-- chevron right -->
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </span>
+    </div>
+  </div>
+</a>

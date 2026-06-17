@@ -1,0 +1,22 @@
+{
+  "name": "imadeit-apps-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfolio website for iMadeIt Apps — iOS & macOS indie development",
+  "type": "module",
+  "engines": {
+    "node": ">=18.17.1"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node scripts/fetch-apps.js && astro build",
+    "preview": "astro preview",
+    "fetch-apps": "node scripts/fetch-apps.js",
+    "build:static": "astro build",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^2.4.5"
+  }
+}

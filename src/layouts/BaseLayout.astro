@@ -1,0 +1,116 @@
+---
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  canonicalPath?: string;
+  /** One or more JSON-LD objects to inject into <head>. */
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = 'iMadeIt Apps — Thoughtful, focused apps for iOS and macOS, crafted by an independent developer.',
+  ogImage,
+  canonicalPath = Astro.url.pathname,
+  structuredData,
+} = Astro.props;
+
+const SITE_URL   = 'https://imadeitapps.github.io';
+const canonical  = SITE_URL + (canonicalPath === '/' ? '' : canonicalPath);
+const pageTitle  = title === 'iMadeIt Apps' ? title : `${title} — iMadeIt Apps`;
+const ogImg      = ogImage ?? `${SITE_URL}/og-image.png`;
+
+// Always include the Organisation schema; callers may append extra schemas.
+const orgSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'iMadeIt Apps',
+  url: SITE_URL,
+  description,
+};
+
+const schemas: Record<string, unknown>[] = [
+  orgSchema,
+  ...(structuredData
+    ? Array.isArray(structuredData) ? structuredData : [structuredData]
+    : []),
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Theme colour -->
+    <meta name="theme-color" content="#050508" />
+
+    <!-- Primary SEO -->
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:site_name"   content="iMadeIt Apps" />
+    <meta property="og:url"         content={canonical} />
+    <meta property="og:title"       content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image"       content={ogImg} />
+    <meta property="og:image:alt"   content="iMadeIt Apps" />
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image"       content={ogImg} />
+
+    <!-- Structured Data -->
+    {schemas.map((sd) => (
+      <script type="application/ld+json" set:html={JSON.stringify(sd)} />
+    ))}
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon"          href="/apple-touch-icon.png" />
+
+    <!-- Sitemap -->
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+  </head>
+
+  <body>
+    <!-- Skip to main content (accessibility) -->
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <Navigation />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <!-- Intersection Observer: reveal .js-reveal elements on scroll -->
+    <script>
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('revealed');
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+      );
+      document.querySelectorAll('.js-reveal').forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>

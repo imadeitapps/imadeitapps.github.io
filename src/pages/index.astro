@@ -1,0 +1,185 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FeaturedAppCard from '../components/FeaturedAppCard.astro';
+import AppCard from '../components/AppCard.astro';
+import appsData from '../data/apps-metadata.json';
+
+// ── Data ────────────────────────────────────────────────────────────────────
+type AppMeta = {
+  id: string;
+  name: string;
+  subtitle: string;
+  description: string;
+  shortDescription: string;
+  icon: string;
+  category: string;
+  genres: string[];
+  rating: number | null;
+  ratingCount: number;
+  developer: string;
+  developerId: string;
+  url: string;
+  price: string;
+  currency: string;
+  version: string;
+  minimumOsVersion: string;
+  releaseDate: string;
+  updatedDate: string;
+  featured: boolean;
+  order: number;
+};
+
+const apps: AppMeta[]    = (appsData as unknown as AppMeta[]) ?? [];
+const featured           = apps.filter((a) => a.featured);
+const regular            = apps.filter((a) => !a.featured);
+const hasApps            = apps.length > 0;
+
+// ── Structured Data ─────────────────────────────────────────────────────────
+const SITE_URL = 'https://imadeitapps.github.io';
+
+const itemListSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'iMadeIt Apps — iOS & macOS Apps',
+  description:
+    'A curated collection of thoughtfully crafted iOS and macOS apps by an independent developer.',
+  url: SITE_URL,
+  itemListElement: apps.map((app, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'MobileApplication',
+      name: app.name,
+      description: app.shortDescription || app.subtitle,
+      applicationCategory: app.category,
+      operatingSystem: 'iOS, macOS',
+      url: app.url,
+      image: app.icon,
+      offers: {
+        '@type': 'Offer',
+        price: app.price === 'Free' ? '0' : app.price.replace(/[^0-9.]/g, ''),
+        priceCurrency: app.currency || 'USD',
+      },
+      ...(app.rating && app.ratingCount > 0
+        ? {
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: app.rating,
+              ratingCount: app.ratingCount,
+            },
+          }
+        : {}),
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="iMadeIt Apps"
+  description="Thoughtful, focused apps for iOS and macOS — crafted by an independent developer."
+  canonicalPath="/"
+  structuredData={hasApps ? itemListSchema : undefined}
+>
+
+  <!-- ═══════════════════════════════════════
+       HERO
+       ═══════════════════════════════════════ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero__inner">
+      <h1 class="hero__title" id="hero-heading">
+        Apps made<br />for purpose.
+      </h1>
+
+      <p class="hero__desc">
+        Small, focused tools built for Apple platforms. Each app is designed to
+        do one thing exceptionally well.
+      </p>
+
+      {hasApps && (
+        <a href="#apps" class="hero__cta">
+          Browse Apps
+          <svg
+            class="cta-arrow"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </a>
+      )}
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════
+       FEATURED APPS
+       ═══════════════════════════════════════ -->
+  {featured.length > 0 && (
+    <section class="section" id="apps" aria-labelledby="featured-heading">
+      <div class="section__header">
+        <h2 class="section__title" id="featured-heading">Featured</h2>
+        <p class="section__subtitle">Hand-picked highlights from the catalogue</p>
+      </div>
+
+      <div class="featured-grid">
+        {featured.map((app) => (
+          <FeaturedAppCard app={app} />
+        ))}
+      </div>
+    </section>
+  )}
+
+
+  <!-- ═══════════════════════════════════════
+       APP GRID
+       ═══════════════════════════════════════ -->
+  {hasApps ? (
+    <section
+      class={`section${featured.length > 0 ? ' section--flush-top' : ''}`}
+      id={featured.length === 0 ? 'apps' : undefined}
+      aria-labelledby="all-apps-heading"
+    >
+      {regular.length > 0 && (
+        <div class="section__header">
+          <h2 class="section__title" id="all-apps-heading">
+            {featured.length > 0 ? 'All Apps' : 'Apps'}
+          </h2>
+          <p class="section__subtitle">
+            {apps.length} app{apps.length !== 1 ? 's' : ''} available on the App Store
+          </p>
+        </div>
+      )}
+
+      {regular.length > 0 ? (
+        <div class="app-grid">
+          {regular.map((app) => (
+            <AppCard app={app} />
+          ))}
+        </div>
+      ) : (
+        <!-- All apps are featured — nothing to show here -->
+        <div />
+      )}
+    </section>
+  ) : (
+    <!-- Empty state (shown before first npm run fetch-apps) -->
+    <section class="section" id="apps">
+      <div class="empty-state">
+        <span class="empty-state__icon" aria-hidden="true">📱</span>
+        <h2 class="empty-state__title">No apps yet</h2>
+        <p class="empty-state__body">
+          Add App Store URLs to <code>data/apps.json</code> and run
+          <code>npm run fetch-apps</code> to populate the catalogue.
+        </p>
+      </div>
+    </section>
+  )}
+
+</BaseLayout>
